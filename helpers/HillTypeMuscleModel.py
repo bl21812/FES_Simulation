@@ -1,4 +1,4 @@
-from forceLength import forceLengthTendon
+from ForceLengthFunctions import forceLengthTendon
 import numpy as np
 import math
 
@@ -43,7 +43,7 @@ class HillTypeMuscleModel:
 
   def muscleTendonLength(self, theta):
     '''
-    Calculates the muscle tendon length
+    Calculates the muscle tendon length (total length)
 
     @param theta: body angle (up from prone horizontal)
     '''
@@ -55,5 +55,5 @@ class HillTypeMuscleModel:
     globalOrigin = np.dot(rotation, self.origin)
     
     difference = globalOrigin - self.insertion;
-    tibialis_anterior_length = math.sqrt(difference[0]**2 + difference[1]**2)
-    return tibialis_anterior_length
+    muscle_tendon_length = math.sqrt(difference[0]**2 + difference[1]**2)
+    return muscle_tendon_length
