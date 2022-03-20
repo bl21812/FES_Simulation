@@ -1,5 +1,5 @@
 import sys
 print(sys.version)
 
-x = []
-print(not x)
+if __name__ == "__main__": 
+  return 

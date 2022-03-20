@@ -1,7 +1,7 @@
 import numpy as np
 import sklearn
 
-def forceLengthTendon(normTendonLengths: list) -> list:
+def forceLengthTendon(normTendonLengths) -> list:
   ''' 
   Determine normalized force produced by series elastic element
 
@@ -14,7 +14,7 @@ def forceLengthTendon(normTendonLengths: list) -> list:
     
   return normForces
 
-def forceLengthParallel(normMuscleLengths: list) -> list:
+def forceLengthParallel(normMuscleLengths) -> list:
   ''' 
   Determine normalized force produced by contractile element
 
@@ -28,9 +28,9 @@ def forceLengthParallel(normMuscleLengths: list) -> list:
   return normForces
 
 
-def forceLengthMuscle(data:list, normMuscleLengths: list) -> list:
+def forceLengthMuscle(data, normMuscleLengths) -> list:
   '''
-  Determine force-length scale factor
+  Determine force-length scale factors
 
   @param data: array-like structure in the form [length, force] used for training a model
   @param normMuscleLengths: list of normalized lengths of contractile elements
