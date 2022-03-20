@@ -1,4 +1,4 @@
-from helpers import MuscleVelocity
+from helpers.MuscleVelocity import MuscleVelocity
 from constants import ankleInertia
 
 # Wrapper for the system of state-space equations.

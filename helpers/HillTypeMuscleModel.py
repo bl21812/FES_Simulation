@@ -1,4 +1,4 @@
-from ForceLengthFunctions import forceLengthTendon
+from helpers.ForceLengthFunctions import forceLengthTendon
 import numpy as np
 import math
 
@@ -6,7 +6,7 @@ class HillTypeMuscleModel:
   '''
   Damped Hill-type muscle model adapted from Millard et al. (2013).The dynamic model is defined in terms of normalized length and velocity.To model a particular muscle, scale factors are needed for force, CE length, and SE length.
   '''
-  def __init__(self, f0m, restingMuscleLength, restingTendonLength, insertion, origin, momentArm activationFunc):
+  def __init__(self, f0m, restingMuscleLength, restingTendonLength, insertion, origin, momentArm, activationFunc):
     '''
     @param f0m: maximum isometric force (N)
     @param restingMuscleLength: actual length (m) of muscle (CE) that corresponds to normalized length of 1

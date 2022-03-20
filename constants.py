@@ -1,9 +1,4 @@
-import numpy as np
-
 ankleInertia = 90
-
-taInsertion = np.transpose([0.06, -0.03])
-taOrigin = np.transpose(np.array([0.3, -0.03]))
 
 data_force_velocity = [
 [-1.0028395556708567, 0.0024834319945283845],
