@@ -38,14 +38,15 @@ if __name__ == "__main__":
  
   initialState = [math.pi/2, 0, 1]
   f = lambda t, x : model(x, [tibialis])
-  y = integrate.RK45(
+  y = integrate.solve_ivp( # uses RK45 by default
     fun = f,
-    t0 = simTimeLower, # initial state
+    t_span = (simTimeLower, simTimeUpper),
     y0 = initialState, # initial condition
-    t_bound = simTimeUpper,
     rtol = rtol,
     atol = atol
   )
+
+  print(y)
   # FES Gait Model w/ sEMG signals
   # taActivation = fesModel.genEMG('constant', {'a': 0.1}, f) # will modify
 
