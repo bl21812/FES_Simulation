@@ -17,7 +17,7 @@ if __name__ == "__main__":
   taOrigin = np.transpose(np.array([0.3, -0.03]))
   
   tibialis = HillTypeMuscleModel(
-    f0m = tibialisF0m, 
+    f0m = taF0m, 
     restingMuscleLength = taRestingMuscleLength,
     restingTendonLength = taRestingTendonLength,
     insertion = taInsertion,

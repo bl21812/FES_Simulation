@@ -1,33 +1,34 @@
 import numpy as np
 import math
-
-def find_d(cFunc):
-    derivCFunc = lambda d : -1 * a * math.exp(a / d) / (b * (d ** 2))
-    return 
+from scipy import optimize
 
 class FES:
 
-  def __init__(self, n1Func):
+  def __init__(self):
     self.neuralActivations = []
-    A = 0.05
-    a10 = 0.3085 + A * np.sin(math.pi/4)
-    u0 = 0.3085 - A * np.cos(math.pi/4)
-    m = (1 - a10) / (1 - u0)
-    b = (a10 - u0) / (1 - u0)
+    self.A = 0.05
+    self.a10 = 0.3085 + self.A * np.sin(math.pi/4)
+    self.u0 = 0.3085 - self.A * np.cos(math.pi/4)
+    self.m = (1 - self.a10) / (1 - self.u0)
+    self.b = (self.a10 - self.u0) / (1 - self.u0)
 
-    cFunc = lambda d : (math.exp(a10 / d) - 1) / u0
-
-    d = find_d(cFunc)
-    c = cFunc(d)
+    cFunc = lambda d : (math.exp(self.a10 / d) - 1) / self.u0
+    self.d = self.find_d(cFunc)
+    self.c = cFunc(self.d)
 
     self.alpha = 0.9486
     self.beta1 = -0.056
     self.beta2 = 0.000627
     
-    self.activation_low = lambda u : d * math.log(c * u + 1)
-    self.activation_high = lambda u : m * u + b
+    self.activation_low = lambda u : d * math.log(self.c * u + 1)
+    self.activation_high = lambda u : self.m * u + self.b
 
-    self.u0 = u0
+  def find_d(self, cFunc):
+    # use Newton-Raphson method to find d 
+    f = lambda d: self.m - d * cFunc(d) / (cFunc(d) * self.u0 + 1)
+    fPrime = lambda d: (1 / self.u0) * (-1 + (1 - self.a10 / d) * math.exp(-1 * self.a10 / d))
+    d = optimize.newton(f, self.u0, fprime = fPrime, tol = 10**-5)
+    return d
 
   def genEMG(self, type, params, freq):
     '''
