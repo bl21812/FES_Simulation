@@ -1,6 +1,6 @@
 import numpy as np
 import math
-import sklearn
+from sklearn.linear_model import Ridge
 from helpers.constants import dataForceVelocity
 
 def forceVelocityMuscle(vm) -> list:
@@ -10,19 +10,21 @@ def forceVelocityMuscle(vm) -> list:
   
   returns force-velocity scale factor
   '''
-  if len(vm[1]) > len(vm[0]):
+  if len(vm) > 1 and len(vm[1]) > len(vm[0]):
     vm = np.array(vm).transpose()
 
-  data = dataForceVelocity
+  xs = [x[0] for x in dataForceVelocity]
+  ys = [x[1] for x in dataForceVelocity]
+  data = [xs, ys]
   # train Ridge model then use model weights to predict vm
-  coefficients = forceVelocityRegression(data)
-  return modelEval(vm, coefficients)
+  model = forceVelocityRegression(data)
+  return modelEval(vm, model.coef_, model.intercept_)
 
-def forceVelocityRegression(data) -> list:
+def forceVelocityRegression(data):
   '''
   @param data: array-like structure in the form [length, force]. used for training.
 
-  returns a ridge coefficients from a ridge regression model fitted on data
+  returns the ridge regression model fitted on data
   '''
   velocities, forces = data
   velocities, forces = np.array(velocities), np.array(forces)
@@ -31,27 +33,31 @@ def forceVelocityRegression(data) -> list:
   for i in np.arange(-1, -0.1, 0.2):
     x.append(sigmoid(velocities, i, 0.15))
 
+  x = np.array(x)
+  x = np.reshape(x, (23, 5))
+
   # create a Ridge model with regularization param = 1
-  model = sklearn.linear_model.Ridge(alpha=1)
+  model = Ridge(fit_intercept = False, alpha=1)
   model.fit(x, forces) # train the model
 
   # return ridge coefficients
-  return model.coef_
+  return model
 
-def modelEval(input, ridge_coeff):
+def modelEval(input, ridge_coeff, intercept):
   '''
   Assume sigmoid type. 
   Helper function to create predictions using coefficients from a ridge model.
+  Returns a scalar.
   '''
   x = []
   for i in np.arange(-1, -0.1, 0.2):
     x.append(sigmoid(input, i, 0.15))
 
   x = np.array(x)
+  x = np.squeeze(x)
     
-  return ridge_coeff[0] + x.dot(ridge_coeff[1:])
+  return intercept + x.dot(ridge_coeff)
 
 def sigmoid(x, mu, sigma): 
-  # Note: np.divide performs element-wise division 
-  exp_term = np.divide(-(x-mu), sigma)
-  return np.divide(1,(1 + math.exp(exp_term)))
+  exp_term = np.divide(-(x-mu), sigma) 
+  return np.divide(1,(1 + np.exp(exp_term)))
