@@ -54,10 +54,10 @@ class HillTypeMuscleModel:
     # define rotation matrix
     rotation = np.matrix([[math.cos(theta), math.sin(theta)], 
                           [math.sin(theta), math.cos(theta)]])
-    
+
     # coordinates in global reference frame
-    globalOrigin = np.dot(rotation, self.origin)
+    globalOrigin = np.dot(rotation, self.origin) # 1x2 matrix
+    difference = globalOrigin - self.insertion; # 1x2 matrix
     
-    difference = globalOrigin - self.insertion;
-    muscle_tendon_length = math.sqrt(difference[0]**2 + difference[1]**2)
-    return muscle_tendon_length
+    muscleTendonLength = math.sqrt(difference[0,0]**2 + difference[0,1]**2)
+    return muscleTendonLength

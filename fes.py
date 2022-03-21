@@ -46,10 +46,10 @@ class FES:
     self.emg = None
     
     if type == 'const':
-      assert('a' in params and 'b' in params)
+      assert ('a' in params)
       self.emg = lambda t : params['a']
     else:
-      assert ('a' in params)
+      assert('a' in params and 'b' in params)
       if type == 'sin':
         self.emg = lambda t : params['a'] * math.sin(t) + params['b']
       elif type == 'cos':

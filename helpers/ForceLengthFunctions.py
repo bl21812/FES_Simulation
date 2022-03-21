@@ -1,6 +1,8 @@
 import numpy as np
 import sklearn
 
+from helpers.constants import dataForceLength
+
 def forceLengthTendon(normTendonLengths) -> list:
   ''' 
   Determine normalized force produced by series elastic element
@@ -28,13 +30,14 @@ def forceLengthParallel(normMuscleLengths) -> list:
   return normForces
 
 
-def forceLengthMuscle(data, normMuscleLengths) -> list:
+def forceLengthMuscle(normMuscleLengths) -> list:
   '''
   Determine force-length scale factors
 
-  @param data: array-like structure in the form [length, force] used for training a model
   @param normMuscleLengths: list of normalized lengths of contractile elements
   '''
+  # TODO: format data in the right way
+  data = dataForceLength # array-like structure in the form [length, force] used for training a model
   model = forceLengthRegression(data)
   return model.predict(normMuscleLengths)
 

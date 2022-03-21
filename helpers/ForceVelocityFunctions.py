@@ -1,17 +1,19 @@
 import numpy as np
 import math
 import sklearn
+from helpers.constants import dataForceVelocity
 
-def forceVelocityMuscle(data, vm) -> list:
-'''
-@param data: array-like structure in the form [velocity, force] used for training a model
-@param vm: muscle (contractile element) velocity) 
-
-returns force-velocity scale factor
-'''
+def forceVelocityMuscle(vm) -> list:
+  '''
+  @param data: array-like structure in the form [velocity, force] used for training a model
+  @param vm: muscle (contractile element) velocity) 
+  
+  returns force-velocity scale factor
+  '''
   if len(vm[1]) > len(vm[0]):
     vm = np.array(vm).transpose()
 
+  data = dataForceVelocity
   # train Ridge model then use model weights to predict vm
   coefficients = forceVelocityRegression(data)
   return modelEval(vm, coefficients)
