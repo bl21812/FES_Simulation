@@ -17,9 +17,8 @@ if __name__ == "__main__":
   fesModel = FES()
 
   # TA constants
-  taF0m = 1
-  taRestingMuscleLength = 1
-  taRestingTendonLength = 1
+  taF0m = 2000
+  taStartingTheta = math.pi / 2
   taMomentArm = 1
   taInsertion = np.transpose([0.06, -0.03])
   taOrigin = np.transpose(np.array([0.3, -0.03]))
@@ -29,8 +28,7 @@ if __name__ == "__main__":
   
   tibialis = HillTypeMuscleModel(
     f0m = taF0m, 
-    restingMuscleLength = taRestingMuscleLength,
-    restingTendonLength = taRestingTendonLength,
+    theta = taStartingTheta, 
     insertion = taInsertion,
     origin = taOrigin, 
     momentArm = taMomentArm,
