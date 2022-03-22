@@ -48,7 +48,7 @@ if __name__ == "__main__":
   )
 
   time = output.t
-  y = output.y
+  y = output.y 
   thetas = y[0]
   taMuscleNormLengths = y[2]
 
@@ -56,12 +56,12 @@ if __name__ == "__main__":
   b = [4, 5, 6]
 
   taMoments = []
-  for theta, taNormMuscleLength in zip(thetas, tibialisMuscleNormLengths):
+  for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
     taMuscleTendonLength = tibialis.muscleTendonLength(theta)
     taMoments.append(tibialis.momentArm * tibialis.getForce(taMuscleTendonLength, taNormMuscleLength))
 
   fig, axs = plt.subplots(2)
-  axs[0].plot(time, theta)
+  axs[0].plot(time, thetas)
   axs[0].set(xlabel = "Time (s)", ylabel = "Theta (rad)")
   
   axs[1].set(xlabel =  "Time (s)", ylabel = "Torques (Nm)")
