@@ -1,5 +1,6 @@
 import sys
 import math
+import os
 import matplotlib.pyplot as plt
 from scipy import integrate
 
@@ -11,14 +12,20 @@ print(sys.version)
 # simulation time span
 simTimeLower = 0 
 simTimeUpper = 5 
+
+# tolerances for simulation
 rtol = 10**-6
 atol = 10**-8
+
 if __name__ == "__main__": 
+  if not os.path.exists("images"):
+    os.mkdir("images")
+    
   fesModel = FES()
 
   # TA constants
   taF0m = 2000
-  taStartingTheta = math.pi / 2
+  taStartingTheta = math.pi/2
   taMomentArm = 0.04
   taInsertion = np.transpose([0.06, -0.03])
   taOrigin = np.transpose(np.array([0.3, -0.03]))
@@ -45,26 +52,27 @@ if __name__ == "__main__":
     atol = atol
   )
 
-  time = output.t
-  y = output.y 
-  thetas = y[0]
-  taMuscleNormLengths = y[2]
+  time, y = output.t, output.y
+  thetas, _, taMuscleNormLengths = y
 
   taMoments = []
   for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
     taMuscleTendonLength = tibialis.muscleTendonLength(theta)
     taMoments.append(tibialis.momentArm * tibialis.getForce(taMuscleTendonLength, taNormMuscleLength))
 
-  fig, axs = plt.subplots(2)
-  axs[0].plot(time, thetas)
-  axs[0].set(xlabel = "Time (s)", ylabel = "Theta (rad)")
+  plotOutput(time, thetas, taMoments, "tibialis anterior", "green", "healthy")
+
+  # plt.show()
   
-  axs[1].set(xlabel =  "Time (s)", ylabel = "Torques (Nm)")
-  axs[1].plot(time, taMoments, 'tab:green', label = "tibialis anterior")
-  axs[1].legend(loc="upper right")
-
-  plt.show()
-
   # FES Gait Model w/ sEMG signals
   # taActivation = fesModel.genEMG('constant', {'a': 0.1}, f) # will modify
 
+def plotOutput(time, thetas, torques, label, colour, fileName):
+  fig, axs = plt.subplots(2)
+  axs[0].plot(time, thetas)
+  axs[0].set(xlabel = "Time (s)", ylabel = "Theta (rad)")
+  axs[1].set(xlabel =  "Time (s)", ylabel = "Torque (Nm)")
+  axs[1].plot(time, torques, f'tab:{colour}', label = label)
+  axs[1].legend(loc="upper right")
+
+  plt.savefig(f"images/{fileName}.png")

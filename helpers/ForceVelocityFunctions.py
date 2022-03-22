@@ -12,21 +12,17 @@ def forceVelocityMuscle(vm) -> list:
   '''
   if len(vm) > 1 and len(vm[1]) > len(vm[0]):
     vm = np.array(vm).transpose()
-
-  xs = [x[0] for x in dataForceVelocity]
-  ys = [x[1] for x in dataForceVelocity]
-  data = [xs, ys]
+ 
   # train Ridge model then use model weights to predict vm
-  model = forceVelocityRegression(data)
+  model = forceVelocityRegression()
   return modelEval(vm, model.coef_, model.intercept_)
 
-def forceVelocityRegression(data):
+def forceVelocityRegression():
   '''
-  @param data: array-like structure in the form [length, force]. used for training.
-
   returns the ridge regression model fitted on data
   '''
-  velocities, forces = data
+  velocities = [x[0] for x in dataForceVelocity]
+  forces = [x[1] for x in dataForceVelocity]
   velocities, forces = np.array(velocities), np.array(forces)
 
   x = []

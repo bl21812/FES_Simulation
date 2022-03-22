@@ -23,25 +23,18 @@ def forceLengthParallel(lm):
 def forceLengthMuscle(normMuscleLength):
   '''
   Determine force-length scale factors
-
   @param normMuscleLength: normalized length of contractile elements
   '''
-  xs = [x[0] for x in dataForceLength]
-  ys = [x[1] for x in dataForceLength]
-  data = [xs, ys] # array-like structure in the form [length, force] used for training a model
-  model = forceLengthRegression(data)
+  model = forceLengthRegression()
   return model.predict([[normMuscleLength]])[0]
 
 
-def forceLengthRegression(data):
+def forceLengthRegression():
   '''
-  Generate a Gaussian model
-  
-  @param data: array-like structure in the form [length, force]. used for training.
-
   returns a Gaussian model that can be used to make predictions
   '''
-  lengths, forces = data
+  lengths = [x[0] for x in dataForceLength]
+  forces = [x[1] for x in dataForceLength]
   lengths, forces = np.array(lengths), np.array(forces)
 
   # normalize the forces and the lengths using the index of the max force
