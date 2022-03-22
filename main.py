@@ -19,7 +19,7 @@ if __name__ == "__main__":
   # TA constants
   taF0m = 2000
   taStartingTheta = math.pi / 2
-  taMomentArm = 1
+  taMomentArm = 0.04
   taInsertion = np.transpose([0.06, -0.03])
   taOrigin = np.transpose(np.array([0.3, -0.03]))
   
@@ -64,8 +64,7 @@ if __name__ == "__main__":
   axs[1].legend(loc="upper right")
 
   plt.show()
-    
-  print(y)
+
   # FES Gait Model w/ sEMG signals
   # taActivation = fesModel.genEMG('constant', {'a': 0.1}, f) # will modify
 
