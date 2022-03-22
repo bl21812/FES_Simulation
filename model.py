@@ -39,11 +39,11 @@ def ankleTorque(theta):
   Returns the approximated ankle torque given the ankle angle. 
   Function is a fourth order polynomial, which approximates the ankle torque based on data from toe off to maximum flexion point of the ankle during swing phase.
   '''
-  a = 0.9020654093720372
-  b = 0.08667091369408163
-  c = 0.0006433455433876395
-  d = -0.0001440269888009832
-  e = -0.000003875116084345257
+  a = 0.9025
+  b = 4.8880
+  c = 1.9100
+  d = -23.5235
+  e = -30.4841
 
   return a + (b * theta) + (c * theta**2) + (d * theta**3) + (e * theta**4)
   

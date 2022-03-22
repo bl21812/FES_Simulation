@@ -25,7 +25,7 @@ if __name__ == "__main__":
   taOrigin = np.transpose(np.array([0.3, -0.03]))
   
   # Healthy Gait Model w/ constant activation 
-  taHealthyActivation = lambda: 0.1 # will modify
+  taHealthyActivation = lambda: 0.4 # will modify
   
   tibialis = HillTypeMuscleModel(
     f0m = taF0m, 
@@ -67,8 +67,6 @@ if __name__ == "__main__":
 
   plt.show()
     
-  
-
   print(y)
   # FES Gait Model w/ sEMG signals
   # taActivation = fesModel.genEMG('constant', {'a': 0.1}, f) # will modify
