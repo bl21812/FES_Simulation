@@ -52,9 +52,6 @@ if __name__ == "__main__":
   thetas = y[0]
   taMuscleNormLengths = y[2]
 
-  a = [1, 2, 3]
-  b = [4, 5, 6]
-
   taMoments = []
   for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
     taMuscleTendonLength = tibialis.muscleTendonLength(theta)
@@ -65,7 +62,8 @@ if __name__ == "__main__":
   axs[0].set(xlabel = "Time (s)", ylabel = "Theta (rad)")
   
   axs[1].set(xlabel =  "Time (s)", ylabel = "Torques (Nm)")
-  axs[1].plot(time, taMoments, 'tab:green')
+  axs[1].plot(time, taMoments, 'tab:green', label = "tibialis anterior")
+  axs[1].legend(loc="upper right")
 
   plt.show()
     
