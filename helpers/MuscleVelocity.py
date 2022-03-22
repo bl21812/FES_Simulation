@@ -4,7 +4,7 @@ from helpers.ForceLengthFunctions import forceLengthMuscle, forceLengthParallel,
 from helpers.ForceVelocityFunctions import forceVelocityMuscle
 from scipy.optimize import fsolve
 
-def getMuscleVelocity(a, lm, lt):
+def getMuscleVelocity(a, lm, lt, forceLengthRegressionModel, forceVelocityRegressionModel):
   '''
   @param a: activation (between 0 and 1)
   @param lm: normalized length of muscle (contractile element) -> scalar value
@@ -17,7 +17,7 @@ def getMuscleVelocity(a, lm, lt):
   f0m = 1
   
   # vm is the velocity of the CE element (muscle)
-  func = lambda vm : f0m * (a * forceLengthMuscle(lm) * forceVelocityMuscle(vm) + forceLengthParallel(lm) + beta * vm) * math.cos(alpha) - f0m * forceLengthTendon(lt)
+  func = lambda vm : f0m * (a * forceLengthMuscle(forceLengthRegressionModel, lm) * forceVelocityMuscle(forceVelocityRegressionModel, vm) + forceLengthParallel(lm) + beta * vm) * math.cos(alpha) - f0m * forceLengthTendon(lt)
   
   vmInitial = 0 # initial condition of the velocity
   root = fsolve(func, vmInitial) # find the roots of the function 

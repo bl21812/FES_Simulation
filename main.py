@@ -1,33 +1,41 @@
 import sys
 import math
 import os
-import matplotlib.pyplot as plt
+import numpy as np
 from scipy import integrate
 
 from helpers.HillTypeMuscleModel import HillTypeMuscleModel
-from fes import *
+from helpers.ForceVelocityFunctions import forceVelocityRegression
+from helpers.ForceLengthFunctions import forceLengthRegression
+from plot import plotOutput
+from fes import FES
 from model import model
+
 print(sys.version)
-
-# simulation time span
-simTimeLower = 0 
-simTimeUpper = 5 
-
-# tolerances for simulation
-rtol = 10**-6
-atol = 10**-8
-
+  
 if __name__ == "__main__": 
   if not os.path.exists("images"):
     os.mkdir("images")
-    
+
+  # simulation time span
+  simTimeLower = 0 
+  simTimeUpper = 5 
+  
+  # tolerances for simulation
+  rtol = 10**-6
+  atol = 10**-8
+
+  # first train the models
+  forceVelocityRegressionModel = forceVelocityRegression()
+  forceLengthRegressionModel = forceLengthRegression()
+  
   fesModel = FES()
 
   # TA constants
-  taF0m = 2000
+  taF0m = 600
   taStartingTheta = math.pi/2
   taMomentArm = 0.04
-  taInsertion = np.transpose([0.06, -0.03])
+  taInsertion = np.transpose(np.array([0.06, -0.03]))
   taOrigin = np.transpose(np.array([0.3, -0.03]))
   
   # Healthy Gait Model w/ constant activation 
@@ -43,7 +51,7 @@ if __name__ == "__main__":
   )
  
   initialState = [math.pi/2, 0, 1]
-  f = lambda t, x : model(x, [tibialis])
+  f = lambda t, x : model(x, [tibialis], forceLengthRegressionModel, forceVelocityRegressionModel)
   output = integrate.solve_ivp( # uses RK45 by default
     fun = f,
     t_span = (simTimeLower, simTimeUpper),
@@ -55,24 +63,13 @@ if __name__ == "__main__":
   time, y = output.t, output.y
   thetas, _, taMuscleNormLengths = y
 
+  print(time, y)
   taMoments = []
   for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
     taMuscleTendonLength = tibialis.muscleTendonLength(theta)
     taMoments.append(tibialis.momentArm * tibialis.getForce(taMuscleTendonLength, taNormMuscleLength))
 
   plotOutput(time, thetas, taMoments, "tibialis anterior", "green", "healthy")
-
-  # plt.show()
   
   # FES Gait Model w/ sEMG signals
   # taActivation = fesModel.genEMG('constant', {'a': 0.1}, f) # will modify
-
-def plotOutput(time, thetas, torques, label, colour, fileName):
-  fig, axs = plt.subplots(2)
-  axs[0].plot(time, thetas)
-  axs[0].set(xlabel = "Time (s)", ylabel = "Theta (rad)")
-  axs[1].set(xlabel =  "Time (s)", ylabel = "Torque (Nm)")
-  axs[1].plot(time, torques, f'tab:{colour}', label = label)
-  axs[1].legend(loc="upper right")
-
-  plt.savefig(f"images/{fileName}.png")

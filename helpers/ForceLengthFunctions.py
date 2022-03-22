@@ -20,12 +20,14 @@ def forceLengthParallel(lm):
   return (3 * (lm - 1)**2)/(0.6 + lm - 1) if lm >= 1 else 0
 
 
-def forceLengthMuscle(normMuscleLength):
+def forceLengthMuscle(model, normMuscleLength):
   '''
   Determine force-length scale factors
+  
+  @param model: Gaussian model
   @param normMuscleLength: normalized length of contractile elements
   '''
-  model = forceLengthRegression()
+  # model = forceLengthRegression()
   return model.predict([[normMuscleLength]])[0]
 
 

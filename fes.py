@@ -20,7 +20,7 @@ class FES:
     self.beta1 = -0.056
     self.beta2 = 0.000627
     
-    self.activation_low = lambda u : d * math.log(self.c * u + 1)
+    self.activation_low = lambda u : self.d * math.log(self.c * u + 1)
     self.activation_high = lambda u : self.m * u + self.b
 
   def find_d(self, cFunc):

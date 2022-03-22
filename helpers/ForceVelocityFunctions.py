@@ -3,9 +3,11 @@ import math
 from sklearn.linear_model import Ridge
 from helpers.constants import dataForceVelocity
 
-def forceVelocityMuscle(vm) -> list:
+import warnings
+
+def forceVelocityMuscle(model, vm) -> list:
   '''
-  @param data: array-like structure in the form [velocity, force] used for training a model
+  @param model: Ridge regression model
   @param vm: muscle (contractile element) velocity) 
   
   returns force-velocity scale factor
@@ -14,13 +16,13 @@ def forceVelocityMuscle(vm) -> list:
     vm = np.array(vm).transpose()
  
   # train Ridge model then use model weights to predict vm
-  model = forceVelocityRegression()
   return modelEval(vm, model.coef_, model.intercept_)
 
 def forceVelocityRegression():
   '''
   returns the ridge regression model fitted on data
   '''
+  # dataForceVelocity is an array-like structure in the form [velocity, force] used for training a model
   velocities = [x[0] for x in dataForceVelocity]
   forces = [x[1] for x in dataForceVelocity]
   velocities, forces = np.array(velocities), np.array(forces)
@@ -36,7 +38,6 @@ def forceVelocityRegression():
   model = Ridge(fit_intercept = False, alpha=1)
   model.fit(x, forces) # train the model
 
-  # return ridge coefficients
   return model
 
 def modelEval(input, ridge_coeff, intercept):
@@ -55,5 +56,7 @@ def modelEval(input, ridge_coeff, intercept):
   return intercept + x.dot(ridge_coeff)
 
 def sigmoid(x, mu, sigma): 
-  exp_term = np.divide(-(x-mu), sigma) 
-  return np.divide(1,(1 + np.exp(exp_term)))
+  exp_term = np.divide(-(x-mu), sigma)
+  sigmoid = np.divide(1,(1 + np.exp(exp_term)))
+    
+  return sigmoid
