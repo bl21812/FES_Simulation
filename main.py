@@ -1,5 +1,6 @@
 import sys
 import math
+import matplotlib.pyplot as plt
 from scipy import integrate
 
 from helpers.HillTypeMuscleModel import HillTypeMuscleModel
@@ -38,13 +39,37 @@ if __name__ == "__main__":
  
   initialState = [math.pi/2, 0, 1]
   f = lambda t, x : model(x, [tibialis])
-  y = integrate.solve_ivp( # uses RK45 by default
+  output = integrate.solve_ivp( # uses RK45 by default
     fun = f,
     t_span = (simTimeLower, simTimeUpper),
     y0 = initialState, # initial condition
     rtol = rtol,
     atol = atol
   )
+
+  time = output.t
+  y = output.y
+  thetas = y[0]
+  taMuscleNormLengths = y[2]
+
+  a = [1, 2, 3]
+  b = [4, 5, 6]
+
+  taMoments = []
+  for theta, taNormMuscleLength in zip(thetas, tibialisMuscleNormLengths):
+    taMuscleTendonLength = tibialis.muscleTendonLength(theta)
+    taMoments.append(tibialis.momentArm * tibialis.getForce(taMuscleTendonLength, taNormMuscleLength))
+
+  fig, axs = plt.subplots(2)
+  axs[0].plot(time, theta)
+  axs[0].set(xlabel = "Time (s)", ylabel = "Theta (rad)")
+  
+  axs[1].set(xlabel =  "Time (s)", ylabel = "Torques (Nm)")
+  axs[1].plot(time, taMoments, 'tab:green')
+
+  plt.show()
+    
+  
 
   print(y)
   # FES Gait Model w/ sEMG signals
