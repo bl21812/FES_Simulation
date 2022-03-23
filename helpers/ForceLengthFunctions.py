@@ -23,5 +23,3 @@ def forceLengthMuscle(model, normMuscleLength):
   @param normMuscleLength: normalized length of contractile elements
   '''
   return model.predict([[normMuscleLength]])[0]
-
-

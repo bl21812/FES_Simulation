@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.linear_model import Ridge, LogisticRegression
+from sklearn.linear_model import Ridge
 from sklearn.gaussian_process import GaussianProcessRegressor
 from helpers.constants import dataForceVelocity, dataForceLength, dataAngleTorque
 
@@ -44,12 +44,13 @@ def forceVelocityRegression():
   return model
 
 def angleTorqueRegression():
-  angles = np.array([x[0] for x in dataForceLength])
-  torques = np.array([x[1] for x in dataForceLength])
+  angles = np.array([x[0] for x in dataAngleTorque])
+  torques = np.array([x[1] for x in dataAngleTorque])
 
   x = []
+  stdDev = np.std(torques)
   for i in np.arange(-1, -0.1, 0.2):
-    x.append(sigmoid(angles, i, 0.55))
+    x.append(sigmoid(angles, i, stdDev))
     
   x = np.array(x)
   x = np.reshape(x, (len(torques), len(x)))

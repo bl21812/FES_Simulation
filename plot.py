@@ -9,3 +9,4 @@ def plotOutput(time, thetas, torques, label, colour, fileName):
   axs[1].legend(loc="upper right")
   axs[1].set_ylim([-25, 50])
   plt.savefig(f"images/{fileName}.png")
+  print(f"Saving plot to images/{fileName}.png")
