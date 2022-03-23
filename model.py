@@ -1,5 +1,5 @@
 from helpers.MuscleVelocity import getMuscleVelocity
-from helpers.Regression import modelEval
+from helpers.regression import modelEval
 
 ankleInertia = 90
 

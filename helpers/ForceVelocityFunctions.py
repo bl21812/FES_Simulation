@@ -1,4 +1,4 @@
-from helpers.Regression import modelEval
+from helpers.regression import modelEval
 
 def forceVelocityMuscle(model, vm):
   '''

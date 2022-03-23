@@ -5,7 +5,7 @@ import numpy as np
 from scipy import integrate
 
 from helpers.HillTypeMuscleModel import HillTypeMuscleModel
-from helpers.Regression import forceVelocityRegression, forceLengthRegression, angleTorqueRegression
+from helpers.regression import forceVelocityRegression, forceLengthRegression, angleTorqueRegression
 from plot import plotOutput
 from model import model
 from activations.healthy import healthy

@@ -49,7 +49,7 @@ def angleTorqueRegression():
 
   x = []
   for i in np.arange(-1, -0.1, 0.2):
-    x.append(sigmoid(angles, i, 0.15))
+    x.append(sigmoid(angles, i, 0.55))
     
   x = np.array(x)
   x = np.reshape(x, (len(torques), len(x)))
