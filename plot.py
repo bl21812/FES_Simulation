@@ -7,5 +7,5 @@ def plotOutput(time, thetas, torques, label, colour, fileName):
   axs[1].set(xlabel = "Time (s)", ylabel = "Torque (Nm)")
   axs[1].plot(time, torques, f'tab:{colour}', label = label)
   axs[1].legend(loc="upper right")
-
+  axs[1].set_ylim([-25, 50])
   plt.savefig(f"images/{fileName}.png")

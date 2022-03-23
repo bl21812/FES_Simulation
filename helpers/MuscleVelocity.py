@@ -21,6 +21,6 @@ def getMuscleVelocity(a, lm, lt, alpha, forceLengthRegressionModel, forceVelocit
   func = lambda vm : f0m * (a * forceLengthMuscle(forceLengthRegressionModel, lm) * forceVelocityMuscle(forceVelocityRegressionModel, vm) + forceLengthParallel(lm) + beta * vm) * math.cos(alpha) - f0m * forceLengthTendon(lt)
   
   vmInitial = 0 # initial condition of the velocity
-  root = fsolve(func, vmInitial, maxfev = 10000) # find the roots of the function 
+  root = fsolve(func, vmInitial) # find the roots of the function 
   
   return root

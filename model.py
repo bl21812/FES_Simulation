@@ -1,9 +1,10 @@
 from helpers.MuscleVelocity import getMuscleVelocity
+from helpers.Regression import modelEval
 
 ankleInertia = 90
 
 # Wrapper for the system of state-space equations.
-def model(x, muscles, forceLengthRegressionModel, forceVelocityRegressionModel):
+def model(x, muscles, forceLengthRegressionModel, forceVelocityRegressionModel, angleTorqueRegressionModel):
   '''
   @param: x: state vector [ankle angle, angular velocity, muscle normalized CE lengths...]
   @param muscles: list of HillTypeMuscleModel objs. the order corresponds to the muscle normalized CE lengths from x at index 2 onwards
@@ -20,7 +21,7 @@ def model(x, muscles, forceLengthRegressionModel, forceVelocityRegressionModel):
     muscleTendonLength = muscle.muscleTendonLength(theta)
     normTendonLength = muscle.normTendonLength(muscleTendonLength, normMuscleLength)
     lengthDeriv = getMuscleVelocity(
-                    a = muscle.activationFunc(theta), 
+                    a = muscle.activationModel.getNextActivation(theta),
                     lm = normMuscleLength, 
                     lt = normTendonLength, 
                     alpha = muscle.pennation, 
@@ -33,25 +34,6 @@ def model(x, muscles, forceLengthRegressionModel, forceVelocityRegressionModel):
     torque = muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength)
     muscleTorques.append(torque)
 
-  angularVelocityDeriv = ankleTorque(theta)/ankleInertia
+  angularVelocityDeriv = -1 * modelEval(theta, angleTorqueRegressionModel.coef_, angleTorqueRegressionModel.intercept_, 0.55)/ankleInertia
   
   return [angularVelocity, angularVelocityDeriv] + muscleNormLengthDerivs
-
-
-def ankleTorque(theta):
-  '''
-  @param theta: angle of the ankle in rad
-  
-  Returns the approximated ankle torque given the ankle angle. 
-  Function is a sixth order polynomial, which approximates the ankle torque based on data from toe off to maximum flexion point of the ankle during swing phase.
-  '''
-  a = -4.6691
-  b = 8.3679
-  c = 4.7637
-  d = -7.8237
-  e = -9.9837
-  f = 13.1250
-  g = -3.5774
-
-  return a + (b * theta) + (c * theta**2) + (d * theta**3) + (e * theta**4) + (f * theta**5) + (g * theta**6) 
-  

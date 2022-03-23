@@ -1,8 +1,9 @@
 import numpy as np
 import math
+from activations.activation import activation
 from scipy import optimize
 
-class FES:
+class FES(activation):
 
   def __init__(self):
     self.neuralActivations = []
@@ -30,7 +31,7 @@ class FES:
     d = optimize.newton(f, self.u0, fprime = fPrime, tol = 10**-5)
     return d
 
-  def genEMG(self, type, params, freq):
+  def genEMG(self, type, params, freq, simTime):
     '''
     Generate sEMG for calling FES instance based on given params
 
@@ -39,10 +40,11 @@ class FES:
       For sinusoids, keys a and b, where N1(t) = asint + b or acost + b
       For constant, key a, where N1(t) = a
     @param freq: Float, frequency (Hz) at which sEMG is sampled
+    @param simTime: Upper bound on the simulation time.
     '''
 
     self.currTimestep = 0
-    self.times = np.linspace(0, 5, 5 * freq + 1) # timestamps, s
+    self.times = np.linspace(0, simTime, 5 * freq + 1) # timestamps, s
     self.emg = None
     
     if type == 'const':
@@ -57,7 +59,7 @@ class FES:
       else:
         raise ValueError('Accepted types are sin, cos and const')
 
-  def getNextActivation(self):
+  def getNextActivation(self, _):
     
     t = self.times[self.currTimestep]
 
@@ -66,7 +68,9 @@ class FES:
 
     u = self.alpha * self.emg(t) - (self.beta1 * uMinus1) - (self.beta2 * uMinus2)
 
+    act = self.activation_low(u) if u < self.u0 else self.activation_high(u)
+
     self.currTimestep += 1
     self.neuralActivations.append(u)
     
-    return
+    return act
