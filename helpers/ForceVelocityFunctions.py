@@ -32,7 +32,7 @@ def forceVelocityRegression():
     x.append(sigmoid(velocities, i, 0.15))
 
   x = np.array(x)
-  x = np.reshape(x, (23, 5))
+  x = np.reshape(x, (len(forces), len(x)))
 
   # create a Ridge model with regularization param = 1
   model = Ridge(fit_intercept = False, alpha=1)

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 def plotOutput(time, thetas, torques, label, colour, fileName):
-  fig, axs = plt.subplots(2)
+  fig, axs = plt.subplots(2, figsize=(25, 25))
   axs[0].plot(time, thetas)
   axs[0].set(xlabel = "Time (s)", ylabel = "Theta (rad)")
   axs[1].set(xlabel = "Time (s)", ylabel = "Torque (Nm)")

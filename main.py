@@ -11,6 +11,9 @@ from plot import plotOutput
 from fes import FES
 from model import model
 
+# import warnings
+# warnings.filterwarnings("ignore")
+
 print(sys.version)
   
 if __name__ == "__main__": 
@@ -19,7 +22,7 @@ if __name__ == "__main__":
 
   # simulation time span
   simTimeLower = 0 
-  simTimeUpper = 5 
+  simTimeUpper = 5
   
   # tolerances for simulation
   rtol = 10**-6
@@ -33,24 +36,28 @@ if __name__ == "__main__":
 
   # TA constants
   taF0m = 600
-  taStartingTheta = math.pi/2
+  taThetaMuscleTendonLength = math.radians(90) # angle @ standing
   taMomentArm = 0.04
   taInsertion = np.transpose(np.array([0.06, -0.03]))
   taOrigin = np.transpose(np.array([0.3, -0.03]))
+  taPennationAngle = math.radians(10)
   
-  # Healthy Gait Model w/ constant activation 
-  taHealthyActivation = lambda: 0.4 # will modify
+  # Healthy Gait Model 
+  # taHealthyActivation = lambda theta: 0 if theta < math.radians(90) else 1 # will modify
+  # taHealthyActivation = lambda theta: 12/5 * theta - 14/15 # testing linear function
+  taHealthyActivation = lambda theta: 0.4 
   
   tibialis = HillTypeMuscleModel(
     f0m = taF0m, 
-    theta = taStartingTheta, 
+    theta = taThetaMuscleTendonLength, 
     insertion = taInsertion,
     origin = taOrigin, 
     momentArm = taMomentArm,
-    activationFunc = taHealthyActivation
+    activationFunc = taHealthyActivation,
+    pennation = taPennationAngle
   )
  
-  initialState = [math.pi/2, 0, 1]
+  initialState = [ math.radians(145), 0, 1] # start at 40 degrees from standing
   f = lambda t, x : model(x, [tibialis], forceLengthRegressionModel, forceVelocityRegressionModel)
   output = integrate.solve_ivp( # uses RK45 by default
     fun = f,
@@ -63,7 +70,6 @@ if __name__ == "__main__":
   time, y = output.t, output.y
   thetas, _, taMuscleNormLengths = y
 
-  print(time, y)
   taMoments = []
   for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
     taMuscleTendonLength = tibialis.muscleTendonLength(theta)

@@ -66,7 +66,7 @@ class FES:
 
     u = self.alpha * self.emg(t) - (self.beta1 * uMinus1) - (self.beta2 * uMinus2)
 
-    # APPEND TO NEURAL ACTIVATIONS LIST
     self.currTimestep += 1
+    self.neuralActivations.append(u)
     
     return
