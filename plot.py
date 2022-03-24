@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 def plotOutput(time, thetas, torques, label, colour, fileName):
-  dir = "scaled_images"
+  dir = "scaled_images_pid"
   if not os.path.exists(dir):
     os.mkdir(dir)
   

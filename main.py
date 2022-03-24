@@ -1,6 +1,7 @@
 import sys
 import math
 import numpy as np
+import pandas as pd
 
 from helpers.HillTypeMuscleModel import HillTypeMuscleModel
 from helpers.regression import forceVelocityRegression, forceLengthRegression, angleTorqueRegression
@@ -9,6 +10,7 @@ from plot import plotOutput
 from model import model
 from activations.healthy import healthy
 from activations.fes import FES
+from pid import PID
 from simulate import simulate
 
 import warnings
@@ -20,7 +22,13 @@ print(sys.version)
 simTimeLower = 0 
 simTimeUpper = 5
 
-if __name__ == "__main__": 
+# initial angle of simulation (deg)
+initAngle = 110
+
+if __name__ == "__main__":
+  # ---------------------------------------------------------------------
+  # Setup
+
   # first get the models
   forceVelocityRegressionModel = forceVelocityRegression()
   forceLengthRegressionModel = forceLengthRegression()
@@ -50,28 +58,29 @@ if __name__ == "__main__":
     pennation = taPennationAngle
   )
  
-  f = lambda t, x : model(x, [tibialis], regressionModels, t)
-  time, thetas, taMuscleNormLengths = simulate(f, tibialis, simTimeUpper, simTimeLower)
+  musclesHealthy = [tibialis]
+  f = lambda t, x : model(x, musclesHealthy, regressionModels, t)
+  time, thetas, allMuscleNormLengths = simulate(f, initAngle, simTimeUpper, simTimeLower)
 
-  taMoments = []
-  for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
-    taMuscleTendonLength = tibialis.muscleTendonLength(theta)
-    taMoments.append(-tibialis.momentArm * tibialis.getForce(taMuscleTendonLength, taNormMuscleLength))
+  allMoments = []
+  for muscle, muscleNormLengths in zip(musclesHealthy, allMuscleNormLengths):
+    moments = []
+    for theta, normMuscleLength in zip(thetas, muscleNormLengths):
+      muscleTendonLength = muscle.muscleTendonLength(theta)
+      moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
+    allMoments.append(moments)
 
+  taMoments = allMoments[0]
   plotOutput(time, thetas, taMoments, "tibialis anterior", "green", "healthy-linear-act")
 
   # ---------------------------------------------------------------------
   # FES Gait Model w/ sEMG signals
 
-  # permutations of activation with b constant (no vert shift)
+  # permuations of different input signals
   fesModels = []
 
   # types = ['sin', 'cos']
   # amplitudes = [0.1, 0.5, 1, 5, 10]
-  # freqs = [1, 100, 250, 500]
-  
-  # types = ['sin', 'cos']
-  # amplitudes = [0.5, 1, 5, 10]
   # freqs = [1, 100, 250, 500]
 
   types = ['sin', 'cos']
@@ -100,13 +109,42 @@ if __name__ == "__main__":
       activationModel = fesModel,
       pennation = taPennationAngle
     )
-    # f = lambda t, x : model(x, [tibialisFES], regressionModels, t)
-    # time, thetas, taMuscleNormLengths = simulate(f, tibialisFES, simTimeUpper, simTimeLower)
+    musclesFES = [tibialisFES]
+    f = lambda t, x : model(x, musclesFES, regressionModels, t)
+    time, thetas, allMuscleNormLengths = simulate(f, initAngle, simTimeUpper, simTimeLower)
 
-    # taMoments = []
-    # for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
-    #   taMuscleTendonLength = tibialisFES.muscleTendonLength(theta)
-    #   taMoments.append(-tibialisFES.momentArm * tibialisFES.getForce(taMuscleTendonLength, taNormMuscleLength))
-      
-    # plotOutput(time, thetas, taMoments, "tibialis anterior", "green", name)
+    allMoments = []
+    for muscle, muscleNormLengths in zip(musclesFES, allMuscleNormLengths):
+      moments = []
+      for theta, normMuscleLength in zip(thetas, muscleNormLengths):
+        muscleTendonLength = muscle.muscleTendonLength(theta)
+        moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
+      allMoments.append(moments)
+        
+    taMoments = allMoments[0]
+    plotOutput(time, thetas, taMoments, "tibialis anterior", "green", name)
 
+
+  # ---------------------------------------------------------------------
+  # PID FES Gait Model 
+  p = 1
+  i = 1
+  d = 1
+
+  healthyGaitPath = "scaled_images/healthy-linear-act.csv"
+  df = pd.read_csv(healthyGaitPath)
+
+  times = df["time"]
+  times = [float(t) for t in times]
+
+  thetas = df["theta"]
+  thetas = [float(theta) for theta in thetas]
+  
+  pid = PID(
+    p = p,
+    i = i,
+    d = d,
+    target = [times, thetas],
+    initState = math.radians(initAngle)
+  )
+  act = pid.update()

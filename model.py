@@ -9,9 +9,8 @@ def model(x, muscles, models, t):
   '''
   @param: x: state vector [ankle angle, angular velocity, muscle normalized CE lengths...]
   @param muscles: list of HillTypeMuscleModel objs. the order corresponds to the muscle normalized CE lengths from x at index 2 onwards
-
-  TODO add comments here
-
+  @param models: list of regression models used to make predictions in the order: forceLengthRegressionModel, forceVelocityRegressionModel, angleTorqueRegressionModel
+  @param t: time step to find the activation
   '''
   forceLengthRegressionModel, forceVelocityRegressionModel, angleTorqueRegressionModel = models
   
