@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.linear_model import Ridge
 from sklearn.gaussian_process import GaussianProcessRegressor
-from helpers.constants import dataForceVelocity, dataForceLength, dataAngleTorque
+from helpers.constants import dataForceVelocity, dataForceLength, dataAngleTorque, dataAngleTorque2
 
 def forceLengthRegression():
   '''
@@ -38,24 +38,24 @@ def forceVelocityRegression():
   x = np.reshape(x, (len(forces), len(x)))
 
   # create a Ridge model with regularization param = 1
-  model = Ridge(fit_intercept = False, alpha=1)
+  model = Ridge(alpha=1)
   model.fit(x, forces) # train the model
 
   return model
 
 def angleTorqueRegression():
-  angles = np.array([x[0] for x in dataAngleTorque])
-  torques = np.array([x[1] for x in dataAngleTorque])
+  angles = np.array([x[0] for x in dataAngleTorque2])
+  torques = np.array([x[1] for x in dataAngleTorque2])
 
   x = []
-  stdDev = np.std(torques)
+  stdDev = np.std(angles)
   for i in np.arange(-1, -0.1, 0.2):
     x.append(sigmoid(angles, i, stdDev))
     
   x = np.array(x)
   x = np.reshape(x, (len(torques), len(x)))
   
-  model = Ridge(fit_intercept = False, alpha=1)
+  model = Ridge(alpha=1)
   model.fit(x, torques)
 
   return model

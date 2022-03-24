@@ -1,14 +1,20 @@
+import math
 from helpers.MuscleVelocity import getMuscleVelocity
 from helpers.regression import modelEval
 
 ankleInertia = 90
 
 # Wrapper for the system of state-space equations.
-def model(x, muscles, forceLengthRegressionModel, forceVelocityRegressionModel, angleTorqueRegressionModel):
+def model(x, muscles, models, t):
   '''
   @param: x: state vector [ankle angle, angular velocity, muscle normalized CE lengths...]
   @param muscles: list of HillTypeMuscleModel objs. the order corresponds to the muscle normalized CE lengths from x at index 2 onwards
+
+  TODO add comments here
+
   '''
+  forceLengthRegressionModel, forceVelocityRegressionModel, angleTorqueRegressionModel = models
+  
   theta, angularVelocity = x[:2]
   normMuscleLengths = x[2:]
 
@@ -21,7 +27,7 @@ def model(x, muscles, forceLengthRegressionModel, forceVelocityRegressionModel, 
     muscleTendonLength = muscle.muscleTendonLength(theta)
     normTendonLength = muscle.normTendonLength(muscleTendonLength, normMuscleLength)
     lengthDeriv = getMuscleVelocity(
-                    a = muscle.activationModel.getNextActivation(theta),
+                    a = muscle.activationModel.getNextActivation(theta, t),
                     lm = normMuscleLength, 
                     lt = normTendonLength, 
                     alpha = muscle.pennation, 
@@ -34,6 +40,22 @@ def model(x, muscles, forceLengthRegressionModel, forceVelocityRegressionModel, 
     torque = muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength)
     muscleTorques.append(torque)
 
-  angularVelocityDeriv = -1 * modelEval(theta, angleTorqueRegressionModel.coef_, angleTorqueRegressionModel.intercept_, 0.55)/ankleInertia
+  # angularVelocityDeriv = -1 * modelEval(theta, angleTorqueRegressionModel.coef_, angleTorqueRegressionModel.intercept_, 0.023)/ankleInertia
+  angularVelocityDeriv = ankleTorque(theta)/ankleInertia
   
   return [angularVelocity, angularVelocityDeriv] + muscleNormLengthDerivs
+
+def ankleTorque(theta): 
+  a = 531.6061154105003
+  b = -1254.1471652109215
+  c = 1106.9915190120637
+  d = -433.2372975668462
+  e = 63.42285178599744
+
+  model = lambda x: a + b*x + c*x**2 + d*x**3 + e*x**4
+  if theta < math.radians(70):
+    return model(math.radians(70))
+  elif theta > math.radians(110):
+    return model(math.radians(110))
+    
+  return model(theta)

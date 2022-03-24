@@ -7,7 +7,7 @@ def simulate(f, tibialis, simTimeUpper, simTimeLower):
   atol = 10**-8
 
   # initial condition
-  initialState = [math.radians(130), 0, 1]
+  initialState = [math.radians(110), 0, 1]
   
   output = integrate.solve_ivp( # uses RK45 by default
     fun = f,
