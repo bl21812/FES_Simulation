@@ -65,7 +65,7 @@ class FES(activation):
 
     u = self.alpha * self.emg(t) - (self.beta1 * uMinus1) - (self.beta2 * uMinus2)
 
-    act = self.activation_low(u) if u < self.u0 else self.activation_high(u)
+    act = self.activation_low(u) if u < self.u0 and u >= 0 else self.activation_high(u)
 
     self.currTimestep += 1
     self.neuralActivations.append(u)

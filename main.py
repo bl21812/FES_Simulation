@@ -1,8 +1,6 @@
 import sys
 import math
-import os
 import numpy as np
-import csv
 
 from helpers.HillTypeMuscleModel import HillTypeMuscleModel
 from helpers.regression import forceVelocityRegression, forceLengthRegression, angleTorqueRegression
@@ -20,12 +18,9 @@ print(sys.version)
 
 # simulation time span
 simTimeLower = 0 
-simTimeUpper = 50
+simTimeUpper = 5
 
 if __name__ == "__main__": 
-  if not os.path.exists("images"):
-    os.mkdir("images")
-
   # first get the models
   forceVelocityRegressionModel = forceVelocityRegression()
   forceLengthRegressionModel = forceLengthRegression()
@@ -45,25 +40,25 @@ if __name__ == "__main__":
 
   # ---------------------------------------------------------------------
   # Healthy Gait Model
-  # tibialis = HillTypeMuscleModel(
-  #   f0m = taF0m, 
-  #   theta = taThetaMuscleTendonLength, 
-  #   insertion = taInsertion,
-  #   origin = taOrigin, 
-  #   momentArm = taMomentArm,
-  #   activationModel = healthyModel,
-  #   pennation = taPennationAngle
-  # )
+  tibialis = HillTypeMuscleModel(
+    f0m = taF0m, 
+    theta = taThetaMuscleTendonLength, 
+    insertion = taInsertion,
+    origin = taOrigin, 
+    momentArm = taMomentArm,
+    activationModel = healthyModel,
+    pennation = taPennationAngle
+  )
  
-  # f = lambda t, x : model(x, [tibialis], regressionModels, t)
-  # time, thetas, taMuscleNormLengths = simulate(f, tibialis, simTimeUpper, simTimeLower)
+  f = lambda t, x : model(x, [tibialis], regressionModels, t)
+  time, thetas, taMuscleNormLengths = simulate(f, tibialis, simTimeUpper, simTimeLower)
 
-  # taMoments = []
-  # for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
-  #   taMuscleTendonLength = tibialis.muscleTendonLength(theta)
-  #   taMoments.append(-tibialis.momentArm * tibialis.getForce(taMuscleTendonLength, taNormMuscleLength))
+  taMoments = []
+  for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
+    taMuscleTendonLength = tibialis.muscleTendonLength(theta)
+    taMoments.append(-tibialis.momentArm * tibialis.getForce(taMuscleTendonLength, taNormMuscleLength))
 
-  # plotOutput(time, thetas, taMoments, "tibialis anterior", "green", "healthy-linear-act")
+  plotOutput(time, thetas, taMoments, "tibialis anterior", "green", "healthy-linear-act")
 
   # ---------------------------------------------------------------------
   # FES Gait Model w/ sEMG signals
@@ -71,17 +66,25 @@ if __name__ == "__main__":
   # permutations of activation with b constant (no vert shift)
   fesModels = []
 
-  types = ['sin', 'cos']
-  activations = [0.1, 0.5, 1, 5, 10]
-  freqs = [1, 100, 250, 500]
+  # types = ['sin', 'cos']
+  # amplitudes = [0.1, 0.5, 1, 5, 10]
+  # freqs = [1, 100, 250, 500]
+  
+  # types = ['sin', 'cos']
+  # amplitudes = [0.5, 1, 5, 10]
+  # freqs = [1, 100, 250, 500]
 
-  for a in activations:
+  types = ['sin', 'cos']
+  amplitudes = [0.1, 1, 10]
+  freqs = [1, 100, 500]
+
+  for a in amplitudes:
     for type in types:
       for freq in freqs:
         fesModel = FES()
         fesModel.genEMG(
           type = type, 
-          params = {'a': a, 'b': freq}, 
+          params = {'a': a * 10**-3, 'b': freq}, 
           freq = freq,
           simTime = simTimeUpper
         )
@@ -97,13 +100,13 @@ if __name__ == "__main__":
       activationModel = fesModel,
       pennation = taPennationAngle
     )
-    f = lambda t, x : model(x, [tibialisFES], regressionModels, t)
-    time, thetas, taMuscleNormLengths = simulate(f, tibialisFES, simTimeUpper, simTimeLower)
+    # f = lambda t, x : model(x, [tibialisFES], regressionModels, t)
+    # time, thetas, taMuscleNormLengths = simulate(f, tibialisFES, simTimeUpper, simTimeLower)
 
-    taMoments = []
-    for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
-      taMuscleTendonLength = tibialisFES.muscleTendonLength(theta)
-      taMoments.append(-tibialisFES.momentArm * tibialisFES.getForce(taMuscleTendonLength, taNormMuscleLength))
+    # taMoments = []
+    # for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
+    #   taMuscleTendonLength = tibialisFES.muscleTendonLength(theta)
+    #   taMoments.append(-tibialisFES.momentArm * tibialisFES.getForce(taMuscleTendonLength, taNormMuscleLength))
       
-    plotOutput(time, thetas, taMoments, "tibialis anterior", "green", name)
+    # plotOutput(time, thetas, taMoments, "tibialis anterior", "green", name)
 

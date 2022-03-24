@@ -41,7 +41,7 @@ def model(x, muscles, models, t):
     muscleTorques.append(torque)
 
   # angularVelocityDeriv = -1 * modelEval(theta, angleTorqueRegressionModel.coef_, angleTorqueRegressionModel.intercept_, 0.023)/ankleInertia
-  angularVelocityDeriv = ankleTorque(theta)/ankleInertia
+  angularVelocityDeriv = muscles[0].f0m * ankleTorque(theta)/ankleInertia
   
   return [angularVelocity, angularVelocityDeriv] + muscleNormLengthDerivs
 
