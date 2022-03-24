@@ -1,7 +1,7 @@
 import math
 from helpers.ForceLengthFunctions import forceLengthMuscle, forceLengthParallel, forceLengthTendon
 from helpers.ForceVelocityFunctions import forceVelocityMuscle
-from scipy.optimize import fsolve, root
+from scipy.optimize import root
 
 def getMuscleVelocity(a, lm, lt, alpha, forceLengthRegressionModel, forceVelocityRegressionModel):
   '''
@@ -20,6 +20,5 @@ def getMuscleVelocity(a, lm, lt, alpha, forceLengthRegressionModel, forceVelocit
   # vm is the velocity of the CE element (muscle)
   func = lambda vm : f0m * (a * forceLengthMuscle(forceLengthRegressionModel, lm) * forceVelocityMuscle(forceVelocityRegressionModel, vm) + forceLengthParallel(lm) + beta * vm) * math.cos(alpha) - f0m * forceLengthTendon(lt)
   
-  vmInitial = 0 # initial condition of the velocity
-  # return fsolve(func, vmInitial, xtol=1e-04, maxfev = 500) # find the roots of the function 
-  return root(func, vmInitial, tol=1e-04, method = "lm").x
+  vmInitial = 0
+  return root(func, vmInitial, tol=1e-04, method = "lm").x # find the roots of the function 

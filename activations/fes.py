@@ -53,17 +53,13 @@ class FES(activation):
     else:
       assert('a' in params and 'b' in params)
       if type == 'sin':
-        self.emg = lambda t : params['a'] * math.sin(t/params['b'])
+        self.emg = lambda t : params['a'] * math.sin(t*params['b'])
       elif type == 'cos':
-        self.emg = lambda t : params['a'] * math.cos(t/params['b'])
+        self.emg = lambda t : params['a'] * math.cos(t*params['b'])
       else:
         raise ValueError('Accepted types are sin, cos and const')
 
   def getNextActivation(self, _, t):
-
-    # print(self.times)
-    # t = self.times[self.currTimestep]
-
     uMinus1 = 0 if not self.neuralActivations else self.neuralActivations[-1]
     uMinus2 = 0 if len(self.neuralActivations) < 2 else self.neuralActivations[-2]
 

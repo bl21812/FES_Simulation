@@ -61,7 +61,7 @@ if __name__ == "__main__":
   # taMoments = []
   # for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
   #   taMuscleTendonLength = tibialis.muscleTendonLength(theta)
-  #   taMoments.append(tibialis.momentArm * tibialis.getForce(taMuscleTendonLength, taNormMuscleLength))
+  #   taMoments.append(-tibialis.momentArm * tibialis.getForce(taMuscleTendonLength, taNormMuscleLength))
 
   # plotOutput(time, thetas, taMoments, "tibialis anterior", "green", "healthy-linear-act")
 
@@ -70,13 +70,13 @@ if __name__ == "__main__":
 
   # permutations of activation with b constant (no vert shift)
   fesModels = []
-  b = 0
+
   types = ['sin', 'cos']
   activations = [0.1, 0.5, 1, 5, 10]
   freqs = [1, 100, 250, 500]
-  
-  for type in types:
-    for a in activations:
+
+  for a in activations:
+    for type in types:
       for freq in freqs:
         fesModel = FES()
         fesModel.genEMG(
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     taMoments = []
     for theta, taNormMuscleLength in zip(thetas, taMuscleNormLengths):
       taMuscleTendonLength = tibialisFES.muscleTendonLength(theta)
-      taMoments.append(tibialisFES.momentArm * tibialisFES.getForce(taMuscleTendonLength, taNormMuscleLength))
+      taMoments.append(-tibialisFES.momentArm * tibialisFES.getForce(taMuscleTendonLength, taNormMuscleLength))
       
     plotOutput(time, thetas, taMoments, "tibialis anterior", "green", name)
 
