@@ -2,8 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
-def plotOutput(time, thetas, torques, label, colour, fileName):
-  dir = "scaled_images_pid"
+def plotOutput(time, thetas, torques, label, colour, dir, fileName):
   if not os.path.exists(dir):
     os.mkdir(dir)
   

@@ -4,7 +4,6 @@ from activations.activation import activation
 from scipy import optimize
 
 class FES(activation):
-
   def __init__(self):
     self.neuralActivations = []
     self.A = 0.05
@@ -43,8 +42,6 @@ class FES(activation):
     @param simTime: Upper bound on the simulation time.
     '''
 
-    self.currTimestep = 0
-    # self.times = np.linspace(0, simTime, simTime * freq + 1) # timestamps, s
     self.emg = None
     
     if type == 'const':
@@ -60,6 +57,10 @@ class FES(activation):
         raise ValueError('Accepted types are sin, cos and const')
 
   def getNextActivation(self, _, t):
+    '''
+    @param t: time
+    returns the activation for the given time step
+    '''
     uMinus1 = 0 if not self.neuralActivations else self.neuralActivations[-1]
     uMinus2 = 0 if len(self.neuralActivations) < 2 else self.neuralActivations[-2]
 
@@ -67,7 +68,6 @@ class FES(activation):
 
     act = self.activation_low(u) if u < self.u0 and u >= 0 else self.activation_high(u)
 
-    self.currTimestep += 1
     self.neuralActivations.append(u)
     
     return act
