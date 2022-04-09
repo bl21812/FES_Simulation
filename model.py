@@ -1,6 +1,7 @@
 import math
 from helpers.MuscleVelocity import getMuscleVelocity
 from helpers.regression import modelEval
+from helpers.GravityMoment import gravityMoment
 
 ankleInertia = 90
 mass = 75 # kg
@@ -47,10 +48,8 @@ def model(x, muscles, models, t):
   # angularVelocityDeriv = mass * ankleTorque(theta)/ankleInertia
   # angularVelocityDeriv = mass * totalTorque/ankleInertia
 
-  ankleMass = 0.0133 * mass
-  g = 9.81
-  dComAnkle = 0.05
-  angularVelocityDeriv = (-muscleTorques + dComAnkle * ankleMass * g * math.sin(theta - math.pi/2))/ankleInertia
+  # angularVelocityDeriv = (-muscleTorques + dComAnkle * ankleMass * g * math.sin(math.pi/2 - theta))/ankleInertia
+  angularVelocityDeriv = (-muscleTorques + gravityMoment(theta, mass))/ankleInertia
   
   return [angularVelocity, angularVelocityDeriv] + muscleNormLengthDerivs
 

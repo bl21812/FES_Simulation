@@ -1,13 +1,12 @@
 import math
 from scipy import integrate
 
-def simulate(f, initAngle, simTimeUpper, simTimeLower, muscles):
+def simulate(f, initAngle, simTimeUpper, simTimeLower):
   '''
   f: function to pass into ivp solver
   initAngle: initial theta (rad) of the system
   simTimeUpper: upper bound on the simulation time
   simTimelower: lower bound on othe simulation time
-  muscles: list of HillTypeMuscleModel objs used in the simulation 
 
   returns time, thetas, and the normal muscle length of the tibialis 
   ''' 
@@ -15,9 +14,11 @@ def simulate(f, initAngle, simTimeUpper, simTimeLower, muscles):
   rtol = 10**-6
   atol = 10**-8
 
+  # rtol = 10**-8
+  # atol = 10**-10
+
   # initial condition
-  normalizedLengths = [0.6*muscle.muscleTendonLength(initAngle) for muscle in muscles]
-  initialState = [initAngle, 0] + normalizedLengths
+  initialState = [initAngle, -1, 1.08]
   
   output = integrate.solve_ivp( # uses RK45 by default
     fun = f,

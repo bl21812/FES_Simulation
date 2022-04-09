@@ -5,6 +5,7 @@ import pandas as pd
 
 from helpers.HillTypeMuscleModel import HillTypeMuscleModel
 from helpers.regression import forceVelocityRegression, forceLengthRegression, angleTorqueRegression
+from helpers.GravityMoment import gravityMoment
 
 from plot import plotOutput
 from model import model
@@ -20,7 +21,7 @@ print(sys.version)
 
 # simulation time span
 simTimeLower = 0 
-simTimeUpper = 0.5
+simTimeUpper = 1
 
 # initial angle of simulation (deg)
 initAngle = math.radians(110)
@@ -39,6 +40,7 @@ if __name__ == "__main__":
 
   # TA constants
   taF0m = 600
+  # taF0m = 100
   taThetaMuscleTendonLength = math.radians(90) # angle @ standing
   taMomentArm = 0.04
   taInsertion = np.array([0.06, -0.03])
@@ -57,28 +59,30 @@ if __name__ == "__main__":
       activationModel = healthyModel,
       pennation = taPennationAngle
     )
-  
     musclesHealthy = [tibialis]
     f = lambda t, x : model(x, musclesHealthy, regressionModels, t)
 
-    time, thetas, allMuscleNormLengths = simulate(f, initAngle, simTimeUpper, simTimeLower, musclesHealthy)
+    time, thetas, allMuscleNormLengths = simulate(f, initAngle, simTimeUpper, simTimeLower)
 
     allMoments = []
     for muscle, muscleNormLengths in zip(musclesHealthy, allMuscleNormLengths):
       moments = []
+      print(muscleNormLengths)
       for theta, normMuscleLength in zip(thetas, muscleNormLengths):
         muscleTendonLength = muscle.muscleTendonLength(theta)
         moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
       allMoments.append(moments)
 
     taMoments = allMoments[0]
+    gravityMoments = [gravityMoment(theta, 75) for theta in thetas]
+    print(taMoments)
     plotOutput(
       time = time, 
       thetas = thetas, 
-      torques = taMoments, 
-      label = "tibialis anterior", 
-      colour = "green", 
-      dir = "scaled_images", 
+      torques = [taMoments, gravityMoments], 
+      labels = ["tibialis anterior", "gravity"],
+      colours = ["g", "m"],
+      dir = "images", 
       fileName = "healthy-linear-act"
     )
 
@@ -136,7 +140,7 @@ if __name__ == "__main__":
         torques = taMoments, 
         label = "tibialis anterior", 
         colour = "green", 
-        dir = "scaled_images", 
+        dir = "images", 
         fileName = name
       )
 
@@ -206,7 +210,7 @@ if __name__ == "__main__":
         torques = taMoments, 
         label = "tibialis anterior", 
         colour = "green", 
-        dir = "scaled_images_pid", 
+        dir = "images_pid", 
         fileName = name
       )
   
