@@ -21,4 +21,4 @@ def getMuscleVelocity(a, lm, lt, alpha, forceLengthRegressionModel, forceVelocit
   func = lambda vm : f0m * (a * forceLengthMuscle(forceLengthRegressionModel, lm) * forceVelocityMuscle(forceVelocityRegressionModel, vm) + forceLengthParallel(lm) + beta * vm) * math.cos(alpha) - f0m * forceLengthTendon(lt)
   
   vmInitial = 0
-  return root(func, vmInitial, tol=1e-04, method = "lm").x # find the roots of the function 
+  return root(func, vmInitial, method = "lm").x # find the roots of the function 

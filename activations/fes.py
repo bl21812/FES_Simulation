@@ -30,7 +30,7 @@ class FES(activation):
     d = optimize.newton(f, self.u0, fprime = fPrime, tol = 10**-5)
     return d
 
-  def genEMG(self, type, params, freq, simTime):
+  def genEMG(self, type, params):
     '''
     Generate sEMG for calling FES instance based on given params
 
@@ -38,8 +38,6 @@ class FES(activation):
     @param params: Dictionary of sEMG signal parameters
       For sinusoids, keys a and b, where N1(t) = asint + b or acost + b
       For constant, key a, where N1(t) = a
-    @param freq: Float, frequency (Hz) at which sEMG is sampled
-    @param simTime: Upper bound on the simulation time.
     '''
 
     self.emg = None

@@ -27,12 +27,12 @@ class HillTypeMuscleModel:
     self.restingMuscleLength = 0.6 * muscleTendonLength # actual length (m) of muscle (CE) that corresponds to normalized length of 1
     self.restingTendonLength = 0.4 * muscleTendonLength # actual length of tendon (m) that corresponds to normalized length of 1 
 
-  def normTendonLength(self, muscleTendonLength, normMuscleLength) -> int:
+  def normTendonLength(self, muscleTendonLength, normMuscleLength):
     ''' 
     Determine the noramlized length of the tendon
     
     @param muscleTendonLength: non-normalized length of the full muscle-tendon complex (m)
-    @param normMuscleLength: normalized length of the contractile element (state varaible)
+    @param normMuscleLength: normalized length of the contractile element (state variable)
     @param restingMuscleLength: actual length (m) of muscle (CE) that corresponds to normalized length of 1
     '''
     return (muscleTendonLength - self.restingMuscleLength * normMuscleLength) / self.restingTendonLength
@@ -42,7 +42,7 @@ class HillTypeMuscleModel:
     Determine the muscle tension 
 
     @param muscleTendonLength: non-normalized length of the full muscle-tendon complex (m)
-    @param normMuscleLength: normalized length of the contractile element (state varaible)
+    @param normMuscleLength: normalized length of the contractile element (state variable)
     '''
     normTendonLength = self.normTendonLength(muscleTendonLength, normMuscleLength)
     return self.f0m * forceLengthTendon(normTendonLength)
@@ -59,7 +59,7 @@ class HillTypeMuscleModel:
                           [math.sin(theta), math.cos(theta)]])
 
     # coordinates in global reference frame
-    globalOrigin = np.matmul(rotation, np.transpose(self.origin)) # 1x2 matrix
+    globalOrigin = rotation @ self.origin # 1x2 matrix
     difference = globalOrigin - self.insertion; # 1x2 matrix
     
     muscleTendonLength = math.sqrt(difference[0,0]**2 + difference[0,1]**2)

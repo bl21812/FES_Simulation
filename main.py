@@ -20,10 +20,10 @@ print(sys.version)
 
 # simulation time span
 simTimeLower = 0 
-simTimeUpper = 5
+simTimeUpper = 0.5
 
 # initial angle of simulation (deg)
-initAngle = 110
+initAngle = math.radians(110)
 
 if __name__ == "__main__":
   # ---------------------------------------------------------------------
@@ -60,7 +60,8 @@ if __name__ == "__main__":
   
     musclesHealthy = [tibialis]
     f = lambda t, x : model(x, musclesHealthy, regressionModels, t)
-    time, thetas, allMuscleNormLengths = simulate(f, initAngle, simTimeUpper, simTimeLower)
+
+    time, thetas, allMuscleNormLengths = simulate(f, initAngle, simTimeUpper, simTimeLower, musclesHealthy)
 
     allMoments = []
     for muscle, muscleNormLengths in zip(musclesHealthy, allMuscleNormLengths):
@@ -102,9 +103,7 @@ if __name__ == "__main__":
           fesModel = FES()
           fesModel.genEMG(
             type = type, 
-            params = {'a': a * 10**-3, 'b': freq}, 
-            freq = freq,
-            simTime = simTimeUpper
+            params = {'a': a * 10**-3, 'b': freq}
           )
           fesModels.append((fesModel, f"{type}-{a}-{freq}"))
 
@@ -211,7 +210,7 @@ if __name__ == "__main__":
         fileName = name
       )
   
-  # healthySim()
+  healthySim()
   # fesSim()
-  pidSim()
+  # pidSim()
 
