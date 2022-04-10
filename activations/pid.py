@@ -25,8 +25,9 @@ class PID(FES):
     self.Kd = d
     self.errors = []
     self.target = target
-    self.state = initState
+    self.state = 0
     self.times = []
+    self.emgPoints = []
 
     super().__init__()
 
@@ -38,6 +39,7 @@ class PID(FES):
     returns: the next activation
     '''
     emg = self.update(theta, t)
+    self.emgPoints.append(emg)
     return self.getActivationFromEmg(emg)
 
   def getActivationFromEmg(self, emg):
@@ -78,7 +80,6 @@ class PID(FES):
 
     output = self.state + p + i + d
     self.state = output
-
     return output
 
   def error_integral(self):

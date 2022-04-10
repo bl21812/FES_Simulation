@@ -41,6 +41,19 @@ if __name__ == "__main__":
   forceLengthRegressionModel = forceLengthRegression()
   regressionModels = [forceLengthRegressionModel, forceVelocityRegressionModel]
 
+  def getMoments(thetas, muscles, allMuscleNormLengths):
+    '''
+    Helper function. Calculate the moments for each muscle given the states returned from the simulation.
+    '''
+    allMoments = []
+    for muscle, muscleNormLengths in zip(muscles, allMuscleNormLengths):
+      moments = []
+      for theta, normMuscleLength in zip(thetas, muscleNormLengths):
+        muscleTendonLength = muscle.muscleTendonLength(theta)
+        moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
+      allMoments.append(moments)
+    return allMoments
+
   # ---------------------------------------------------------------------
   # Healthy Gait Model
   def healthySim():
@@ -58,14 +71,7 @@ if __name__ == "__main__":
     f = lambda t, x : model(x, musclesHealthy, regressionModels, t)
 
     time, thetas, allMuscleNormLengths = simulate(f, initAngle, simTimeUpper, simTimeLower)
-
-    allMoments = []
-    for muscle, muscleNormLengths in zip(musclesHealthy, allMuscleNormLengths):
-      moments = []
-      for theta, normMuscleLength in zip(thetas, muscleNormLengths):
-        muscleTendonLength = muscle.muscleTendonLength(theta)
-        moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
-      allMoments.append(moments)
+    allMoments = getMoments(thetas, musclesHealthy, allMuscleNormLengths)
 
     plotOutput(
       time = time, 
@@ -85,13 +91,9 @@ if __name__ == "__main__":
     # permuations of different input signals
     fesModels = []
 
-    # types = ['sin', 'cos']
-    # amplitudes = [0.1, 0.5, 1, 5, 10]
-    # freqs = [1, 100, 250, 500]
-
-    types = ['wavelet']
-    amplitudes = [0.1, 1, 10]
-    freqs = [25, 100, 500]
+    types = ['sin', 'square', 'wavelet']
+    amplitudes = [0.1, 1, 5, 10] # in mV
+    freqs = [25, 100, 250, 500] # in Hz
 
     for a in amplitudes:
       for type in types:
@@ -116,14 +118,7 @@ if __name__ == "__main__":
       musclesFES = [tibialisFES]
       f = lambda t, x : model(x, musclesFES, regressionModels, t)
       time, thetas, allMuscleNormLengths = simulate(f, initAngle, simTimeUpper, simTimeLower)
-
-      allMoments = []
-      for muscle, muscleNormLengths in zip(musclesFES, allMuscleNormLengths):
-        moments = []
-        for theta, normMuscleLength in zip(thetas, muscleNormLengths):
-          muscleTendonLength = muscle.muscleTendonLength(theta)
-          moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
-        allMoments.append(moments)
+      allMoments = getMoments(thetas, musclesFES, allMuscleNormLengths)
           
       plotOutput(
         time = time, 
@@ -155,9 +150,13 @@ if __name__ == "__main__":
     thetas = [float(theta) for theta in thetas]
 
     # create permuations for the pid coefficients
-    Ps = [1, 100, 500, 1000]
-    Is = [1, 25, 100, 500]
-    Ds = [0.1, 1, 10, 100]
+    # Ps = [1, 100, 500, 1000]
+    # Is = [1, 25, 100, 500]
+    # Ds = [0.1, 1, 10, 100]
+
+    Ps = [1]
+    Is = [0]
+    Ds = [0]
 
     pidModels = []
     for p in Ps:
@@ -168,7 +167,7 @@ if __name__ == "__main__":
             i = i,
             d = d,
             target = [times, thetas],
-            initState = math.radians(initAngle)
+            initState = initAngle
           )
           pidModels.append((pid, f"{p}-{i}-{d}"))
     
@@ -186,14 +185,7 @@ if __name__ == "__main__":
       musclesPID = [tibialisPID]
       f = lambda t, x : model(x, musclesPID, regressionModels, t)
       time, thetas, allMuscleNormLengths = simulate(f, initAngle, simTimeUpper, simTimeLower)
-
-      allMoments = []
-      for muscle, muscleNormLengths in zip(musclesPID, allMuscleNormLengths):
-        moments = []
-        for theta, normMuscleLength in zip(thetas, muscleNormLengths):
-          muscleTendonLength = muscle.muscleTendonLength(theta)
-          moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
-        allMoments.append(moments)
+      allMoments = getMoments(thetas, musclesPID, allMuscleNormLengths)
           
       plotOutput(
         time = time, 
@@ -202,7 +194,8 @@ if __name__ == "__main__":
         labels = ["tibialis anterior"], 
         colours = ["green"], 
         dir = "images_pid", 
-        fileName = name
+        fileName = name,
+        fes = pid
       )
   
   healthySim()

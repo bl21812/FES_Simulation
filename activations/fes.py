@@ -54,8 +54,8 @@ class FES(activation):
         self.emg = lambda t : params['a'] * signal.square(params['b']*t)
       elif type == 'wavelet':
         p = 1/params['b']
-        tspan = np.linspace(0, p, 100)
-        y = params['a']*np.array(signal.gausspulse(tspan))
+        tspan = np.linspace(0, p, 500)
+        y = params['a']*np.array(signal.gausspulse(tspan, fc = 500))
         self.emg = lambda t: y[(np.abs(tspan - (t%p))).argmin()]
       else:
         raise ValueError('Accepted types are sin, square, and wavelet')
