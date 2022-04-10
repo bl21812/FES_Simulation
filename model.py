@@ -14,7 +14,7 @@ def model(x, muscles, models, t):
   @param models: list of regression models used to make predictions in the order: forceLengthRegressionModel, forceVelocityRegressionModel, angleTorqueRegressionModel
   @param t: time step to find the activation
   '''
-  forceLengthRegressionModel, forceVelocityRegressionModel, angleTorqueRegressionModel = models
+  forceLengthRegressionModel, forceVelocityRegressionModel = models
   
   theta, angularVelocity = x[:2]
   normMuscleLengths = x[2:]
@@ -41,36 +41,6 @@ def model(x, muscles, models, t):
     torque = muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength)
     muscleTorques += torque
 
-  # angularVelocityDeriv = -1 * modelEval(theta, angleTorqueRegressionModel.coef_, angleTorqueRegressionModel.intercept_, 0.023)/ankleInertia
-  # cycleLength = 2
-  # linearPortion = 0.1
-  # totalTorque = ankleTorqueLinear(theta) if (t % cycleLength)/cycleLength <= linearPortion * cycleLength else ankleTorque(theta)
-  # angularVelocityDeriv = mass * ankleTorque(theta)/ankleInertia
-  # angularVelocityDeriv = mass * totalTorque/ankleInertia
-
-  # angularVelocityDeriv = (-muscleTorques + dComAnkle * ankleMass * g * math.sin(math.pi/2 - theta))/ankleInertia
   angularVelocityDeriv = (-muscleTorques + gravityMoment(theta, mass))/ankleInertia
   
   return [angularVelocity, angularVelocityDeriv] + muscleNormLengthDerivs
-
-def ankleTorque(theta): 
-  a = 531.6061154105003
-  b = -1254.1471652109215
-  c = 1106.9915190120637
-  d = -433.2372975668462
-  e = 63.42285178599744
-
-  model = lambda x: a + b*x + c*x**2 + d*x**3 + e*x**4
-  if theta < math.radians(70):
-    return model(math.radians(70))
-  elif theta > math.radians(110):
-    return model(math.radians(110))
-    
-  return model(theta)
-
-def ankleTorqueLinear(theta): 
-  a = 4.2337
-  b = -2.1987
-
-  model = lambda x: a + b*x
-  return model(theta)

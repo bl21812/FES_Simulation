@@ -4,10 +4,8 @@ import numpy as np
 import pandas as pd
 
 from helpers.HillTypeMuscleModel import HillTypeMuscleModel
-from helpers.regression import forceVelocityRegression, forceLengthRegression, angleTorqueRegression
-from helpers.GravityMoment import gravityMoment
-
-from plot import plotOutput
+from helpers.regression import forceVelocityRegression, forceLengthRegression
+from plot import *
 from model import model
 from activations.healthy import healthy
 from activations.fes import FES
@@ -26,30 +24,27 @@ simTimeUpper = 1
 # initial angle of simulation (deg)
 initAngle = math.radians(110)
 
+# TA constants
+taF0m = 600
+# taF0m = 100
+taThetaMuscleTendonLength = math.radians(90) # angle @ standing
+taMomentArm = 0.04
+taInsertion = np.array([0.06, -0.03])
+taOrigin = np.array([0.3, -0.03])
+taPennationAngle = math.radians(10)
+
 if __name__ == "__main__":
   # ---------------------------------------------------------------------
   # Setup
-  # get the models
+  # get regression models
   forceVelocityRegressionModel = forceVelocityRegression()
   forceLengthRegressionModel = forceLengthRegression()
-  angleTorqueRegressionModel = angleTorqueRegression()
-
-  regressionModels = [forceLengthRegressionModel, forceVelocityRegressionModel, angleTorqueRegressionModel]
-  # create healthy models
-  healthyModel = healthy(muscleActivation = 1)
-
-  # TA constants
-  taF0m = 600
-  # taF0m = 100
-  taThetaMuscleTendonLength = math.radians(90) # angle @ standing
-  taMomentArm = 0.04
-  taInsertion = np.array([0.06, -0.03])
-  taOrigin = np.array([0.3, -0.03])
-  taPennationAngle = math.radians(10)
+  regressionModels = [forceLengthRegressionModel, forceVelocityRegressionModel]
 
   # ---------------------------------------------------------------------
   # Healthy Gait Model
   def healthySim():
+    healthyModel = healthy(muscleActivation = 0.2)
     tibialis = HillTypeMuscleModel(
       f0m = taF0m, 
       theta = taThetaMuscleTendonLength, 
@@ -67,23 +62,20 @@ if __name__ == "__main__":
     allMoments = []
     for muscle, muscleNormLengths in zip(musclesHealthy, allMuscleNormLengths):
       moments = []
-      print(muscleNormLengths)
       for theta, normMuscleLength in zip(thetas, muscleNormLengths):
         muscleTendonLength = muscle.muscleTendonLength(theta)
         moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
       allMoments.append(moments)
 
-    taMoments = allMoments[0]
-    gravityMoments = [gravityMoment(theta, 75) for theta in thetas]
-    print(taMoments)
     plotOutput(
       time = time, 
       thetas = thetas, 
-      torques = [taMoments, gravityMoments], 
-      labels = ["tibialis anterior", "gravity"],
+      torques = allMoments,
+      labels = ["tibialis anterior"],
       colours = ["g", "m"],
       dir = "images", 
-      fileName = "healthy-linear-act"
+      fileName = "healthy-act",
+      muscleNormLengths = allMuscleNormLengths
     )
 
   # ---------------------------------------------------------------------
@@ -97,9 +89,9 @@ if __name__ == "__main__":
     # amplitudes = [0.1, 0.5, 1, 5, 10]
     # freqs = [1, 100, 250, 500]
 
-    types = ['sin', 'cos']
+    types = ['wavelet']
     amplitudes = [0.1, 1, 10]
-    freqs = [1, 100, 500]
+    freqs = [25, 100, 500]
 
     for a in amplitudes:
       for type in types:
@@ -133,15 +125,15 @@ if __name__ == "__main__":
           moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
         allMoments.append(moments)
           
-      taMoments = allMoments[0]
       plotOutput(
         time = time, 
         thetas = thetas, 
-        torques = taMoments, 
-        label = "tibialis anterior", 
-        colour = "green", 
+        torques = allMoments, 
+        labels = ["tibialis anterior"], 
+        colours = ["green"], 
         dir = "images", 
-        fileName = name
+        fileName = name,
+        fes = fesModel.emg
       )
 
   # ---------------------------------------------------------------------
@@ -153,7 +145,7 @@ if __name__ == "__main__":
     # d = 0.4
 
     # get the ideal input
-    healthyGaitPath = "scaled_images/healthy-linear-act.csv"
+    healthyGaitPath = "images/healthy-act.csv"
     df = pd.read_csv(healthyGaitPath)
 
     times = df["time"]
@@ -203,18 +195,17 @@ if __name__ == "__main__":
           moments.append(-muscle.momentArm * muscle.getForce(muscleTendonLength, normMuscleLength))
         allMoments.append(moments)
           
-      taMoments = allMoments[0]
       plotOutput(
         time = time, 
         thetas = thetas, 
-        torques = taMoments, 
-        label = "tibialis anterior", 
-        colour = "green", 
+        torques = allMoments, 
+        labels = ["tibialis anterior"], 
+        colours = ["green"], 
         dir = "images_pid", 
         fileName = name
       )
   
   healthySim()
-  # fesSim()
+  fesSim()
   # pidSim()
 

@@ -2,6 +2,7 @@ import numpy as np
 import math
 from activations.activation import activation
 from scipy import optimize
+from scipy import signal
 
 class FES(activation):
   def __init__(self):
@@ -49,10 +50,15 @@ class FES(activation):
       assert('a' in params and 'b' in params)
       if type == 'sin':
         self.emg = lambda t : params['a'] * math.sin(t*params['b'])
-      elif type == 'cos':
-        self.emg = lambda t : params['a'] * math.cos(t*params['b'])
+      elif type == 'square':
+        self.emg = lambda t : params['a'] * signal.square(params['b']*t)
+      elif type == 'wavelet':
+        p = 1/params['b']
+        tspan = np.linspace(0, p, 100)
+        y = params['a']*np.array(signal.gausspulse(tspan))
+        self.emg = lambda t: y[(np.abs(tspan - (t%p))).argmin()]
       else:
-        raise ValueError('Accepted types are sin, cos and const')
+        raise ValueError('Accepted types are sin, square, and wavelet')
 
   def getNextActivation(self, _, t):
     '''

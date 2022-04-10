@@ -43,22 +43,6 @@ def forceVelocityRegression():
 
   return model
 
-def angleTorqueRegression():
-  angles = np.array([x[0] for x in dataAngleTorque])
-  torques = np.array([x[1] for x in dataAngleTorque])
-
-  x = []
-  stdDev = np.std(angles)
-  for i in np.arange(-1, -0.1, 0.2):
-    x.append(sigmoid(angles, i, stdDev))
-    
-  x = np.array(x)
-  x = np.reshape(x, (len(torques), len(x)))
-  
-  model = Ridge(alpha=1)
-  model.fit(x, torques)
-
-  return model
 
 def modelEval(input, ridgeCoeff, intercept, sigma):
   '''

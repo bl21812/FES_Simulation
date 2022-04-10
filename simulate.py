@@ -1,4 +1,3 @@
-import math
 from scipy import integrate
 
 def simulate(f, initAngle, simTimeUpper, simTimeLower):
@@ -13,9 +12,6 @@ def simulate(f, initAngle, simTimeUpper, simTimeLower):
   # tolerances for simulation
   rtol = 10**-6
   atol = 10**-8
-
-  # rtol = 10**-8
-  # atol = 10**-10
 
   # initial condition
   initialState = [initAngle, -1, 1.08]

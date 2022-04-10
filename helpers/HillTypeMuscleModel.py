@@ -59,7 +59,7 @@ class HillTypeMuscleModel:
                           [math.sin(theta), math.cos(theta)]])
 
     # coordinates in global reference frame
-    globalOrigin = rotation @ self.origin # 1x2 matrix
+    globalOrigin = rotation @ self.origin.T # 1x2 matrix
     difference = globalOrigin - self.insertion; # 1x2 matrix
     
     muscleTendonLength = math.sqrt(difference[0,0]**2 + difference[0,1]**2)
