@@ -67,6 +67,7 @@ if __name__ == "__main__":
       activationModel = healthyModel,
       pennation = taPennationAngle
     )
+
     musclesHealthy = [tibialis]
     f = lambda t, x : model(x, musclesHealthy, regressionModels, t)
 
@@ -78,7 +79,7 @@ if __name__ == "__main__":
       thetas = thetas, 
       torques = allMoments,
       labels = ["tibialis anterior"],
-      colours = ["g", "m"],
+      colours = ["g"],
       dir = "images", 
       fileName = "healthy-act",
       muscleNormLengths = allMuscleNormLengths
@@ -155,8 +156,8 @@ if __name__ == "__main__":
     # Ds = [0.1, 1, 10, 100]
 
     Ps = [1]
-    Is = [0]
-    Ds = [0]
+    Is = [1]
+    Ds = [1]
 
     pidModels = []
     for p in Ps:
@@ -167,7 +168,6 @@ if __name__ == "__main__":
             i = i,
             d = d,
             target = [times, thetas],
-            initState = initAngle
           )
           pidModels.append((pid, f"{p}-{i}-{d}"))
     
@@ -198,7 +198,7 @@ if __name__ == "__main__":
         fes = pid
       )
   
-  healthySim()
-  fesSim()
-  # pidSim()
+  # healthySim()
+  # fesSim()
+  pidSim()
 

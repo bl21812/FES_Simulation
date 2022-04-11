@@ -12,13 +12,12 @@ class PID(FES):
   '''
   Standard PID controller
   '''
-  def __init__(self, p, i, d, target, initState):
+  def __init__(self, p, i, d, target):
     '''
     @param p: Constant
     @param i: Constant
     @param d: Constant
     @param target: Size 2 list, target[0] is times, target[1] is thetas
-    @param initState: Initial theta
     '''
     self.Kp = p
     self.Ki = i
@@ -63,10 +62,9 @@ class PID(FES):
     @param pred: Float - predicted theta at timestep k
     @param t: current timestep 
     '''
-    
     pred_ind = nearest_index(self.target, t)
+    e = self.target[1][pred_ind] - pred
 
-    e = pred - self.target[1][pred_ind]
     lastErr = 0 if not self.errors else self.errors[-1]
     lastTime = 0 if not self.times else self.times[-1]
 
